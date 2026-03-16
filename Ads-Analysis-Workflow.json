@@ -1,0 +1,592 @@
+{
+  "name": "Ads Analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "binaryPropertyName": "=ad",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -32
+      ],
+      "id": "9adba85d-009c-4ebe-a68a-f7377bae9a72",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b085e5e-ccdd-4172-ae04-9c058645fbdb",
+              "name": "ad name",
+              "value": "={{ $json['Ad Name'] }}",
+              "type": "string"
+            },
+            {
+              "id": "c3f01d88-d34a-4ffa-a96f-7c3f76aeddac",
+              "name": "ad id",
+              "value": "={{ $json['Ad ID'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f8af72a3-a303-49a2-80d9-5fb5634bab10",
+              "name": "impreesion",
+              "value": "={{ $json.Impressions }}",
+              "type": "string"
+            },
+            {
+              "id": "97ae5a83-4ece-4f71-891b-d56c73ac89b1",
+              "name": "clicks",
+              "value": "={{ $json.Clicks }}",
+              "type": "string"
+            },
+            {
+              "id": "54354c31-8371-48ff-a9c2-e22b4941503a",
+              "name": "spend",
+              "value": "={{ $json['Spend ($)'] }}",
+              "type": "string"
+            },
+            {
+              "id": "11b31ae5-5f8f-42d6-887f-eed078b16204",
+              "name": "conversions",
+              "value": "={{ $json.Conversions }}",
+              "type": "string"
+            },
+            {
+              "id": "4fe8cb53-9fb7-4f2a-8051-ffa1683b181e",
+              "name": "CTR %",
+              "value": "={{ $json['CTR (%)'] }}",
+              "type": "string"
+            },
+            {
+              "id": "0246a9b5-f263-4894-9ecc-b2c14a775514",
+              "name": "CPC",
+              "value": "={{ $json['CPC ($)'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e7eebc39-7c32-4361-b3cf-188cb9a00024",
+              "name": "ROAS",
+              "value": "={{ $json.ROAS }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        -32
+      ],
+      "id": "8bb58515-7fc0-40bd-b893-2a8a6eed2f65",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -32
+      ],
+      "id": "48b7b93f-058e-4561-93ed-d589684fd4af",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": ".",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Role: You are a Senior Performance Marketing Analyst. Your task is to evaluate a specific Facebook Ad creative based on the provided metrics and give a strategic recommendation.\nAd Metrics to Analyze:\nAd Name: {{ $json[\"ad name\"] }}\n\nAd ID: {{ $json[\"ad id\"] }}\n\nImpressions: {{ $json.impreesion }}\n\nClicks: {{ $json.clicks }}\n\nSpend: ${{ $json.spend }}\n\nConversions: {{ $json.conversions }}\n\nCTR: {{ $json[\"CTR %\"] }}%\n\nCPC: ${{ $json.CPC }}\n\nROAS: {{ $json.ROAS }}x\n\nInstructions:\nCompare Metrics: Analyze the relationship between CTR, CPC, and ROAS. (e.g., If CTR is high but ROAS is low, the landing page might be the problem).\n\nFinal Verdict: Choose ONLY one: (🚀 SCALE | 🛠️ OPTIMIZE | 🛑 STOP).\n\nStrategic Reasoning: Briefly explain \"WHY\" you gave this verdict in 2 sentences.\n\nAction Plan: Give one clear instruction for the user to do next.\n\nOutput Format (Strictly):\nVerdict: [Your Verdict]\nAnalysis: [Your brief analysis]\nRecommendation: [One clear action step"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        624,
+        -32
+      ],
+      "id": "a2877abc-8298-4853-a61f-7299186d354f",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "anthropic/claude-3.7-sonnet",
+          "mode": "list",
+          "cachedResultName": "anthropic/claude-3.7-sonnet"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        160
+      ],
+      "id": "c9271de9-5b99-4c09-8c28-9a0ad7c5f9c4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0iU6MihBKMuJf7qZ",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -32
+      ],
+      "id": "f7d882e7-9adf-4363-8ce8-e158dbebb084",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ad_by AI",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        -32
+      ],
+      "id": "090b08db-1bf1-4070-ac8f-3eb1f6aa9cf8",
+      "name": "Webhook",
+      "webhookId": "22e7db75-8269-472d-b2c9-490301d8d0c6"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.data.map(item => item.text).join(\"\\n\\n---\\n\\n\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1216,
+        -32
+      ],
+      "id": "756f2f33-4f81-4ca3-8d22-2ba629d69db0",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {
+    "Extract from File1": [
+      {
+        "json": {
+          "Ad ID": "1001",
+          "Ad Name": "Vid_Pro_01",
+          "Campaign Name": "Black_Friday_2026",
+          "Ad Set Name": "Interest_Tech",
+          "Impressions": "12,500",
+          "Clicks": "450",
+          "Spend ($)": "150.00",
+          "Conversions": "22",
+          "CTR (%)": "3.60",
+          "CPC ($)": "0.33",
+          "ROAS": "4.5"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Ad ID": "1002",
+          "Ad Name": "Img_Sale_02",
+          "Campaign Name": "Black_Friday_2026",
+          "Ad Set Name": "LAL_Customers",
+          "Impressions": "8,200",
+          "Clicks": "180",
+          "Spend ($)": "95.50",
+          "Conversions": "12",
+          "CTR (%)": "2.20",
+          "CPC ($)": "0.53",
+          "ROAS": "3.2"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Ad ID": "1003",
+          "Ad Name": "Carousel_New",
+          "Campaign Name": "Retargeting_Q1",
+          "Ad Set Name": "Website_Visitors",
+          "Impressions": "5,400",
+          "Clicks": "310",
+          "Spend ($)": "120.00",
+          "Conversions": "45",
+          "CTR (%)": "5.74",
+          "CPC ($)": "0.39",
+          "ROAS": "6.8"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Ad ID": "1004",
+          "Ad Name": "Vid_Story_01",
+          "Campaign Name": "Awareness_Global",
+          "Ad Set Name": "Broad_Audience",
+          "Impressions": "45,000",
+          "Clicks": "900",
+          "Spend ($)": "300.00",
+          "Conversions": "5",
+          "CTR (%)": "2.00",
+          "CPC ($)": "0.33",
+          "ROAS": "0.8"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Ad ID": "1005",
+          "Ad Name": "Img_Static_05",
+          "Campaign Name": "Lead_Gen_Test",
+          "Ad Set Name": "Small_Business_Owners",
+          "Impressions": "3,100",
+          "Clicks": "65",
+          "Spend ($)": "45.20",
+          "Conversions": "8",
+          "CTR (%)": "2.10",
+          "CPC ($)": "0.70",
+          "ROAS": "2.1"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Ad ID": "1006",
+          "Ad Name": "Vid_Demo_02",
+          "Campaign Name": "Black_Friday_2026",
+          "Ad Set Name": "Interest_Tech",
+          "Impressions": "15,600",
+          "Clicks": "520",
+          "Spend ($)": "185.00",
+          "Conversions": "30",
+          "CTR (%)": "3.33",
+          "CPC ($)": "0.36",
+          "ROAS": "5.1"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "Ad ID": "1007",
+          "Ad Name": "Img_UGC_01",
+          "Campaign Name": "Retargeting_Q1",
+          "Ad Set Name": "Cart_Abandoners",
+          "Impressions": "2,800",
+          "Clicks": "215",
+          "Spend ($)": "88.00",
+          "Conversions": "19",
+          "CTR (%)": "7.68",
+          "CPC ($)": "0.41",
+          "ROAS": "7.4"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Edit Fields1": [
+      {
+        "json": {
+          "ad name": "Vid_Pro_01",
+          "ad id": "1001",
+          "impreesion": "12,500",
+          "clicks": "450",
+          "spend": "150.00",
+          "conversions": "22",
+          "CTR %": "3.60",
+          "CPC": "0.33",
+          "ROAS": "4.5"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "ad name": "Img_Sale_02",
+          "ad id": "1002",
+          "impreesion": "8,200",
+          "clicks": "180",
+          "spend": "95.50",
+          "conversions": "12",
+          "CTR %": "2.20",
+          "CPC": "0.53",
+          "ROAS": "3.2"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "ad name": "Carousel_New",
+          "ad id": "1003",
+          "impreesion": "5,400",
+          "clicks": "310",
+          "spend": "120.00",
+          "conversions": "45",
+          "CTR %": "5.74",
+          "CPC": "0.39",
+          "ROAS": "6.8"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "ad name": "Vid_Story_01",
+          "ad id": "1004",
+          "impreesion": "45,000",
+          "clicks": "900",
+          "spend": "300.00",
+          "conversions": "5",
+          "CTR %": "2.00",
+          "CPC": "0.33",
+          "ROAS": "0.8"
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "ad name": "Img_Static_05",
+          "ad id": "1005",
+          "impreesion": "3,100",
+          "clicks": "65",
+          "spend": "45.20",
+          "conversions": "8",
+          "CTR %": "2.10",
+          "CPC": "0.70",
+          "ROAS": "2.1"
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "ad name": "Vid_Demo_02",
+          "ad id": "1006",
+          "impreesion": "15,600",
+          "clicks": "520",
+          "spend": "185.00",
+          "conversions": "30",
+          "CTR %": "3.33",
+          "CPC": "0.36",
+          "ROAS": "5.1"
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      },
+      {
+        "json": {
+          "ad name": "Img_UGC_01",
+          "ad id": "1007",
+          "impreesion": "2,800",
+          "clicks": "215",
+          "spend": "88.00",
+          "conversions": "19",
+          "CTR %": "7.68",
+          "CPC": "0.41",
+          "ROAS": "7.4"
+        },
+        "pairedItem": {
+          "item": 6
+        }
+      }
+    ],
+    "Basic LLM Chain": [
+      {
+        "json": {
+          "text": "Verdict: 🚀 SCALE\n\nAnalysis: This ad shows exceptional performance with a strong 3.60% CTR (well above industry average), efficient $0.33 CPC, and an impressive 4.5x ROAS indicating strong targeting and creative resonance with the audience. The combination of high engagement and strong return on ad spend suggests this creative is effectively converting qualified traffic.\n\nRecommendation: Increase daily budget by 25-30% incrementally while closely monitoring performance metrics to ensure ROAS remains stable during scaling."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "text": "Verdict: 🚀 SCALE\n\nAnalysis: This ad is performing well with a healthy 2.20% CTR (above industry average), reasonable $0.53 CPC, and excellent 3.2x ROAS indicating strong profitability. The conversion rate of 6.67% (12 conversions from 180 clicks) shows the traffic is qualified and the landing page is effectively converting.\n\nRecommendation: Increase daily budget by 30-50% while monitoring ROAS closely over the next 7 days to ensure performance remains stable at scale."
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "text": "# Ad Creative Analysis\n\nVerdict: 🚀 SCALE\n\nAnalysis: This ad is performing exceptionally well with a strong 5.74% CTR (well above industry average), efficient $0.39 CPC, and outstanding 6.8x ROAS. The metrics indicate both strong audience targeting and creative performance, with the conversion rate of nearly 15% suggesting the landing page is effectively converting traffic.\n\nRecommendation: Increase daily budget by 30-50% while maintaining close monitoring of performance metrics to ensure ROAS remains stable as spend scales up."
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "text": "# Facebook Ad Analysis\n\nVerdict: 🛠️ OPTIMIZE\n\nAnalysis: With a decent CTR (2.00%) and low CPC ($0.33), this ad is capturing attention efficiently, but the poor ROAS (0.8x) indicates it's not converting viewers into customers effectively. The 5 conversions from 900 clicks suggests a significant drop-off in the conversion funnel after the click occurs.\n\nRecommendation: Review and optimize your landing page experience to address conversion barriers, focusing on improving page load speed, clarifying value proposition, and simplifying the purchase path."
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "text": "# Ad Performance Analysis for Img_Static_05 (ID: 1005)\n\nVerdict: 🛠️ OPTIMIZE\n\nAnalysis: This ad shows moderate performance with a decent CTR (2.10%) and positive ROAS (2.1x), indicating it's profitable but has room for improvement. The CPC ($0.70) is reasonable, but with only 8 conversions from 65 clicks, the conversion rate (12.3%) suggests the ad is attracting clicks but could be better at converting those clicks into customers.\n\nRecommendation: Test variations of this creative that maintain the elements driving the good CTR while improving the conversion messaging to increase the conversion rate and boost overall ROAS."
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "text": "# Facebook Ad Performance Analysis\n\n## Ad: Vid_Demo_02 (ID: 1006)\n\nVerdict: 🚀 SCALE\n\nAnalysis: This ad demonstrates excellent performance with a strong 3.33% CTR (well above industry average), an efficient $0.36 CPC, and an impressive 5.1x ROAS. The high CTR combined with strong ROAS indicates both the creative and conversion funnel are working effectively together, making this ad a prime candidate for scaling.\n\nRecommendation: Increase daily budget by 20-30% increments every 3-4 days while closely monitoring ROAS to ensure performance stability during scaling."
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      },
+      {
+        "json": {
+          "text": "Verdict: 🚀 SCALE\n\nAnalysis: This ad is performing exceptionally well with a strong 7.68% CTR (well above industry averages), efficient $0.41 CPC, and an impressive 7.4x ROAS, indicating both strong creative engagement and conversion efficiency. The metrics show a healthy funnel with users not just clicking but converting at a rate that's generating significant return on ad spend.\n\nRecommendation: Increase the daily budget by 25-50% while closely monitoring performance for 3-5 days to ensure ROAS remains stable during scaling."
+        },
+        "pairedItem": {
+          "item": 6
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "042583fc-fbca-492d-a786-704aa8069f6d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcbe09ccbbddd3d6421f211847e8d5eb930b1ffb0232081c420179e72777824e"
+  },
+  "id": "1bEoo8inx-1eNYGFE8Zc8",
+  "tags": []
+}
