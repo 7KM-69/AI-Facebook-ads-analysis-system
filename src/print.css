@@ -1,0 +1,38 @@
+@media print {
+    body {
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .premium-card {
+        background-color: #ffffff;
+        border: 1px solid #e5e5e5;
+        box-shadow: none;
+        break-inside: avoid;
+        color: #000000;
+    }
+
+    .text-small {
+        color: #666666;
+    }
+
+    .btn-primary {
+        display: none;
+    }
+
+    /* Force background colors for print */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
